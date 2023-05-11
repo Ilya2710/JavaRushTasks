@@ -15,7 +15,6 @@ public class Solution extends C {
 
     private A a = new A() {
         { //у анонимных классов нет своих конструкторов, но что-то можно сделать в блоке инициализации класса
-            /// Test commit
             value = "Y";
             if (super.getClass().getName().contains(".Solution$")) {
                 System.out.print(value);
