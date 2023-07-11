@@ -11,6 +11,8 @@ public class Student extends Human {
     private Date beginningOfSession;
     private Date endOfSession;
 
+    private int course;
+
     public Student(String name, int age, double averageGrade) {
         super(name, age);
         this.averageGrade = averageGrade;
@@ -29,6 +31,10 @@ public class Student extends Human {
 
     public void setUniversity(String university) {
         this.university = university;
+    }
+
+    public int getCourse() {
+        return course;
     }
 
     public void printData() {
