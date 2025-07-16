@@ -3,8 +3,12 @@ package com.javarush.task.task30.task3008;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Server {
+    private static Map<String, Connection> connectionMap = new ConcurrentHashMap<String, Connection>();
+
     public static void main(String[] args) throws IOException {
         int port;
         ServerSocket serverSocket = null;
@@ -26,6 +30,16 @@ public class Server {
             if(serverSocket != null) {
                 serverSocket.close();
             }
+        }
+    }
+
+    public static void sendBroadcastMessage(Message message) {
+        try {
+            for (String key: connectionMap.keySet()) {
+                connectionMap.get(key).send(message);
+            }
+        } catch (IOException e) {
+            System.out.println("Cannot send message");
         }
     }
 
