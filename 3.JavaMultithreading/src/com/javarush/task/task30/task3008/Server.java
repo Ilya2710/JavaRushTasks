@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Server {
-    private static Map<String, Connection> connectionMap = new ConcurrentHashMap<String, Connection>();
+    private static Map<String, Connection> connectionMap = new ConcurrentHashMap<>();
 
     public static void main(String[] args) throws IOException {
         int port;
@@ -48,6 +48,45 @@ public class Server {
 
         private Handler(Socket socket) {
             this.socket = socket;
+        }
+
+        private String serverHandshake(Connection connection) throws IOException, ClassNotFoundException {
+            String clientName = null;
+            boolean isClientNameRecieved = false;
+
+            try {
+                while (!isClientNameRecieved) {
+                    Message nameRequestMessage = new Message(MessageType.NAME_REQUEST);
+                    connection.send(nameRequestMessage);
+
+                    Message userNameMessage = connection.receive();
+
+                    if(userNameMessage == null || userNameMessage.getType() != MessageType.USER_NAME) {
+                        continue;
+                    }
+
+                    clientName = userNameMessage.getData();
+
+                    if (clientName == null || "".equals(clientName)) {
+                        continue;
+                    }
+
+                    if(connectionMap.containsKey(clientName)) {
+                        continue;
+                    }
+
+                    connectionMap.put(clientName, connection);
+                    Message userNameAcceptedMessage = new Message(MessageType.NAME_ACCEPTED);
+                    connection.send(userNameAcceptedMessage);
+                    isClientNameRecieved = true;
+                }
+            } catch (IOException e) {
+                throw new IOException(e);
+            } catch (ClassNotFoundException e) {
+                throw new ClassNotFoundException(e.getMessage());
+            }
+
+            return clientName;
         }
     }
 }
