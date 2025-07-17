@@ -6,12 +6,12 @@ public class Message implements Serializable {
     private final MessageType type;
     private final String data;
 
-    Message (MessageType type) {
+    public Message (MessageType type) {
         this.type = type;
         this.data = null;
     }
 
-    Message (MessageType type, String data) {
+    public Message (MessageType type, String data) {
         this.type = type;
         this.data = data;
     }
