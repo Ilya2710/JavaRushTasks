@@ -99,7 +99,7 @@ public class Server {
                     Message userNameMessage = connection.receive();
 
                     if(userNameMessage == null || userNameMessage.getType() != MessageType.USER_NAME) {
-                        ConsoleHelper.writeMessage("Message from " + socket.getRemoteSocketAddress() + " has incorrect type");
+                        ConsoleHelper.writeMessage("Сообщение от " + socket.getRemoteSocketAddress() + " имеет некорректный тип.");
                         continue;
                     }
 
@@ -107,13 +107,13 @@ public class Server {
 
                     if (clientName == null || clientName.isEmpty()) {
                         ConsoleHelper.writeMessage(socket.getRemoteSocketAddress()
-                                + " is trying to connect to the server with an empty name.");
+                                + " пытается подключиться к серверу с пустым именем.");
                         continue;
                     }
 
                     if(connectionMap.containsKey(clientName)) {
                         ConsoleHelper.writeMessage(socket.getRemoteSocketAddress()
-                                + " is trying to connect to the server with a name that is already in use.");
+                                + " пытается подключиться к серверу с именем, которое уже используется.");
                         continue;
                     }
 
@@ -146,7 +146,7 @@ public class Server {
                 if (textMessage.getType() == MessageType.TEXT) {
                     sendBroadcastMessage(new Message(MessageType.TEXT, userName + ": " + textMessage.getData()));
                 } else {
-                    ConsoleHelper.writeMessage("Message from " + socket.getRemoteSocketAddress() + " has incorrect type.");
+                    ConsoleHelper.writeMessage("Сообщение от " + socket.getRemoteSocketAddress() + " имеет некорректный тип.");
                 }
             }
         }
