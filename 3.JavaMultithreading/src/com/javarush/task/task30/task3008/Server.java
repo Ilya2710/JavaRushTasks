@@ -13,11 +13,12 @@ public class Server {
         int port;
         ServerSocket serverSocket = null;
 
+        ConsoleHelper.writeMessage("Input server port:");
         port = ConsoleHelper.readInt();
 
         try {
             serverSocket = new ServerSocket(port);
-            System.out.println("Server started successfully.");
+            ConsoleHelper.writeMessage("Server started successfully.");
 
             while(true) {
                 Socket client = serverSocket.accept();
@@ -25,7 +26,7 @@ public class Server {
                 handler.start();
             }
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            ConsoleHelper.writeMessage("An error occurred while starting or running the server.");
         } finally {
             if(serverSocket != null) {
                 serverSocket.close();
@@ -34,12 +35,12 @@ public class Server {
     }
 
     public static void sendBroadcastMessage(Message message) {
-        try {
-            for (String key: connectionMap.keySet()) {
-                connectionMap.get(key).send(message);
+        for (String clientName: connectionMap.keySet()) {
+            try {
+                connectionMap.get(clientName).send(message);
+            } catch (IOException e) {
+                ConsoleHelper.writeMessage("Cannot send message to client " + clientName);
             }
-        } catch (IOException e) {
-            System.out.println("Cannot send message");
         }
     }
 
@@ -62,16 +63,21 @@ public class Server {
                     Message userNameMessage = connection.receive();
 
                     if(userNameMessage == null || userNameMessage.getType() != MessageType.USER_NAME) {
+                        ConsoleHelper.writeMessage("Message from " + socket.getRemoteSocketAddress() + " has incorrect type");
                         continue;
                     }
 
                     clientName = userNameMessage.getData();
 
-                    if (clientName == null || "".equals(clientName)) {
+                    if (clientName == null || clientName.isEmpty()) {
+                        ConsoleHelper.writeMessage(socket.getRemoteSocketAddress()
+                                + " is trying to connect to the server with an empty name.");
                         continue;
                     }
 
                     if(connectionMap.containsKey(clientName)) {
+                        ConsoleHelper.writeMessage(socket.getRemoteSocketAddress()
+                                + " is trying to connect to the server with a name that is already in use.");
                         continue;
                     }
 
@@ -87,6 +93,15 @@ public class Server {
             }
 
             return clientName;
+        }
+
+        private void notifyUsers(Connection connection, String userName) throws IOException {
+            for (String existingUserName : connectionMap.keySet()) {
+                if(existingUserName.equals(userName)) {
+                    continue;
+                }
+                connection.send(new Message(MessageType.USER_ADDED, existingUserName));
+            }
         }
     }
 }
