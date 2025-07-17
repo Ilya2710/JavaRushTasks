@@ -51,6 +51,42 @@ public class Server {
             this.socket = socket;
         }
 
+        @Override
+        public void run() {
+            Connection connection = null;
+            String clientName = null;
+            ConsoleHelper.writeMessage("New connection with " + socket.getRemoteSocketAddress()
+                    + " established.");
+
+            try {
+                connection = new Connection(socket);
+                clientName = serverHandshake(connection);
+                sendBroadcastMessage(new Message(MessageType.USER_ADDED, clientName));
+                notifyUsers(connection, clientName);
+                serverMainLoop(connection, clientName);
+            } catch (IOException | ClassNotFoundException e) {
+                ConsoleHelper.writeMessage("An error occurred while exchanging data with "
+                        + socket.getRemoteSocketAddress() + ".");
+                }
+
+            try {
+                if(connection != null) {
+                    connection.close();
+                }
+            } catch (IOException e) {
+                ConsoleHelper.writeMessage("An error occurred while exchanging data with "
+                        + socket.getRemoteSocketAddress() + ".");
+            }
+
+            if (clientName != null) {
+                connectionMap.remove(clientName);
+                sendBroadcastMessage(new Message(MessageType.USER_REMOVED, clientName));
+            }
+
+            ConsoleHelper.writeMessage("Connection with " + socket.getRemoteSocketAddress()
+                    + " is closed.");
+        }
+
         private String serverHandshake(Connection connection) throws IOException, ClassNotFoundException {
             String clientName = null;
             boolean isClientNameRecieved = false;
@@ -110,7 +146,7 @@ public class Server {
                 if (textMessage.getType() == MessageType.TEXT) {
                     sendBroadcastMessage(new Message(MessageType.TEXT, userName + ": " + textMessage.getData()));
                 } else {
-                    ConsoleHelper.writeMessage("Incorrect message type.");
+                    ConsoleHelper.writeMessage("Message from " + socket.getRemoteSocketAddress() + " has incorrect type.");
                 }
             }
         }
