@@ -103,5 +103,16 @@ public class Server {
                 connection.send(new Message(MessageType.USER_ADDED, existingUserName));
             }
         }
+
+        private  void serverMainLoop(Connection connection, String userName) throws IOException, ClassNotFoundException {
+            while (true) {
+                Message textMessage = connection.receive();
+                if (textMessage.getType() == MessageType.TEXT) {
+                    sendBroadcastMessage(new Message(MessageType.TEXT, userName + ": " + textMessage.getData()));
+                } else {
+                    ConsoleHelper.writeMessage("Incorrect message type.");
+                }
+            }
+        }
     }
 }
