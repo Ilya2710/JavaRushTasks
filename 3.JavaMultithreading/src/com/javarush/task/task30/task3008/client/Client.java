@@ -11,6 +11,7 @@ import java.net.Socket;
 public class Client {
     protected Connection connection;
     private volatile boolean clientConnected = false;
+    private final String UNEXPECTED_MESSAGE_TYPE = "Unexpected MessageType";
 
     public static void main(String[] args) throws InterruptedException {
         Client client = new Client();
@@ -105,7 +106,7 @@ public class Client {
                 Message message = connection.receive();
 
                 if(message.getType() == null) {
-                    throw new IOException("Unexpected MessageType");
+                    throw new IOException(UNEXPECTED_MESSAGE_TYPE);
                 }
                 switch (message.getType()) {
                     case TEXT:
@@ -118,7 +119,7 @@ public class Client {
                         informAboutDeletingNewUser(message.getData());
                         break;
                     default:
-                        throw new IOException("Unexpected MessageType");
+                        throw new IOException(UNEXPECTED_MESSAGE_TYPE);
                 }
             }
         }
@@ -128,7 +129,7 @@ public class Client {
                 Message message = connection.receive();
 
                 if(message.getType() == null) {
-                    throw new IOException("Unexpected MessageType");
+                    throw new IOException(UNEXPECTED_MESSAGE_TYPE);
                 }
 
                 switch (message.getType()) {
@@ -139,7 +140,7 @@ public class Client {
                         notifyConnectionStatusChanged(true);
                         return;
                     default:
-                        throw new IOException("Unexpected MessageType");
+                        throw new IOException(UNEXPECTED_MESSAGE_TYPE);
                 }
             }
         }
