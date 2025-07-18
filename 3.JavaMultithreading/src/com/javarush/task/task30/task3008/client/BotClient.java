@@ -32,6 +32,7 @@ public class BotClient extends Client {
     }
 
     public class BotSocketThread extends SocketThread {
+        final String USER_TEXT_DELIMITER = ": ";
 
         @Override
         protected void clientMainLoop() throws IOException, ClassNotFoundException {
@@ -43,12 +44,12 @@ public class BotClient extends Client {
         protected void processIncomingMessage(String message) {
             ConsoleHelper.writeMessage(message);
 
-            if (!message.contains(": ")) {
+            if (!message.contains(USER_TEXT_DELIMITER)) {
                 return;
             }
 
-            String userName = message.substring(0, message.indexOf(": "));
-            String textMessage = message.substring(message.indexOf(": ") + 2);
+            String userName = message.substring(0, message.indexOf(USER_TEXT_DELIMITER));
+            String textMessage = message.substring(message.indexOf(USER_TEXT_DELIMITER) + 2);
             /*
             if(userName == null || textMessage == null) {
                 return;
@@ -88,7 +89,7 @@ public class BotClient extends Client {
             SimpleDateFormat formatter = new SimpleDateFormat(pattern);
             Calendar calendar = new GregorianCalendar();
             Date cuttentDate = calendar.getTime();
-            sendTextMessage("Информация для " + userName + ": " + formatter.format(cuttentDate));
+            sendTextMessage("Информация для " + userName + USER_TEXT_DELIMITER + formatter.format(cuttentDate));
         }
     }
 }
